@@ -84,22 +84,15 @@ export default function ApplicationDrawer({
               of the policy factors.
             </div>
           )}
-          {modelTrained ? (
-            <button
-              className="secondary-button full-button"
-              onClick={() => onAssess(application)}
-            >
-              <Sparkles size={15} />{" "}
-              {application.ai_score == null
-                ? "Run risk assessment"
-                : "Refresh assessment"}
-            </button>
-          ) : (
-            <div className="assessment-prompt">
-              A trained model is not available yet. Staff can still review and
-              decide the application using its submitted details.
-            </div>
-          )}
+          <button
+            className="secondary-button full-button"
+            onClick={() => onAssess(application)}
+          >
+            <Sparkles size={15} />{" "}
+            {application.ai_score == null
+              ? "Run AI review"
+              : "Re-run AI review"}
+          </button>
         </div>
         <div className="drawer-section">
           <div className="drawer-section-title">

@@ -8,6 +8,7 @@ import {
   CalendarDays,
   Check,
   ChevronDown,
+  CircleHelp,
   CreditCard,
   Download,
   FileText,
@@ -21,6 +22,7 @@ import {
   Sparkles,
   Users,
   WalletCards,
+  X,
 } from "lucide-react";
 import StatCard from "../components/StatCard.jsx";
 import StatusPill from "../components/StatusPill.jsx";
@@ -61,9 +63,9 @@ function exportApplications(applications) {
 // This page displays portfolio-wide tools for administrators and superusers.
 export default function AdminDashboard({
   activeNav,
-  applications,
+  applications = [],
   currentUser,
-  dashboard,
+  dashboard = {},
   decideApplication,
   dateLabel,
   displayName,
@@ -72,13 +74,13 @@ export default function AdminDashboard({
   load,
   loading,
   loadError,
-  loans,
+  loans = [],
   markDisbursed,
   markRead,
-  notifications,
+  notifications = [],
   offline,
   query,
-  riskModelStatus,
+  riskModelStatus = {},
   recordPayment,
   runAssessment,
   selected,
@@ -95,8 +97,10 @@ export default function AdminDashboard({
   toast,
   trainRiskModel,
   trainingModel,
-  visibleApplications,
+  visibleApplications = [],
 }) {
+  const modelStatus = riskModelStatus || {};
+  const dash = dashboard || {};
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -400,21 +404,15 @@ export default function AdminDashboard({
                         </td>
                         <td>
                           {application.ai_score == null ? (
-                            riskModelStatus.trained ? (
-                              <button
-                                className="assess-link"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  runAssessment(application);
-                                }}
-                              >
-                                <Sparkles size={13} /> Run assessment
-                              </button>
-                            ) : (
-                              <span className="muted-empty">
-                                Waiting for trained model
-                              </span>
-                            )
+                            <button
+                              className="assess-link"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                runAssessment(application);
+                              }}
+                            >
+                              <Sparkles size={13} /> Run AI review
+                            </button>
                           ) : (
                             <div className="score-cell">
                               <span
@@ -501,36 +499,36 @@ export default function AdminDashboard({
                 </p>
                 <div className="model-training-box">
                   <strong>
-                    {riskModelStatus.stale_model_exists
+                    {modelStatus.stale_model_exists
                       ? "Saved model is due for retraining"
-                      : riskModelStatus.trained
+                      : modelStatus.trained
                         ? "Model trained from backend records"
                         : "Model not trained"}
                   </strong>
-                  <span>{riskModelStatus.message}</span>
+                  <span>{modelStatus.message || "Risk assessment policy active."}</span>
                   <span>
-                    {riskModelStatus.sample_count} eligible outcomes ·{" "}
-                    {riskModelStatus.repaid_count} repaid ·{" "}
-                    {riskModelStatus.delinquent_count} seriously delinquent
+                    {modelStatus.sample_count || 0} eligible outcomes ·{" "}
+                    {modelStatus.repaid_count || 0} repaid ·{" "}
+                    {modelStatus.delinquent_count || 0} seriously delinquent
                   </span>
-                  {riskModelStatus.balanced_accuracy != null && (
+                  {modelStatus.balanced_accuracy != null && (
                     <span>
                       Held-out balanced accuracy:{" "}
-                      {Math.round(riskModelStatus.balanced_accuracy * 100)}%
+                      {Math.round(modelStatus.balanced_accuracy * 100)}%
                     </span>
                   )}
                   <button
                     className="secondary-button"
-                    disabled={!riskModelStatus.can_train || trainingModel}
+                    disabled={!modelStatus.can_train || trainingModel}
                     onClick={trainRiskModel}
                   >
                     {trainingModel
                       ? "Training model…"
-                      : riskModelStatus.trained
+                      : modelStatus.trained
                         ? "Retrain from current data"
                         : "Train model from backend data"}
                   </button>
-                  <small>{riskModelStatus.limitations}</small>
+                  <small>{modelStatus.limitations || "Automated policy and risk assessment rules apply."}</small>
                 </div>
                 <div className="ai-metrics">
                   <div>
