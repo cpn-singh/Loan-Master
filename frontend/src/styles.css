@@ -2670,6 +2670,11 @@ tbody tr:hover {
   box-shadow: 0 12px 35px #31554117;
   backdrop-filter: blur(10px);
   animation: float-card 5s ease-in-out infinite;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+  pointer-events: none;
 }
 .float-card-approved {
   left: 0;
@@ -3488,10 +3493,10 @@ tbody tr:hover {
 @keyframes float-card {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translate3d(0, -8px, 0);
   }
 }
 @keyframes scroll-dot {

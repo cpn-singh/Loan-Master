@@ -126,9 +126,13 @@ export default function LoanScene() {
           map: logoTexture,
           transparent: true,
           toneMapped: false,
+          depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -1,
+          polygonOffsetUnits: -1,
         }),
       );
-      logo.position.set(-0.78, 0.68, 0.11);
+      logo.position.set(-0.78, 0.68, 0.125);
       card.add(logo);
       const cardLabelTexture = textTexture(
         "YOUR LOAN. IN CLEAR VIEW.",
@@ -141,9 +145,13 @@ export default function LoanScene() {
           map: cardLabelTexture,
           transparent: true,
           toneMapped: false,
+          depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -1,
+          polygonOffsetUnits: -1,
         }),
       );
-      cardLabel.position.set(-0.36, -0.67, 0.11);
+      cardLabel.position.set(-0.36, -0.67, 0.125);
       card.add(cardLabel);
       const gold = new THREE.MeshPhysicalMaterial({
         color: 0xd4b276,
@@ -222,9 +230,13 @@ export default function LoanScene() {
           map: rupeeTexture,
           transparent: true,
           toneMapped: false,
+          depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -1,
+          polygonOffsetUnits: -1,
         }),
       );
-      rupee.position.set(0.04, 0.17, 0.61);
+      rupee.position.set(0.04, 0.17, 0.63);
       coinStack.add(rupee);
       scene.add(coinStack);
       objects.push(coinStack);
