@@ -60,7 +60,7 @@ def record_risk_assessment(application):
     return application
 
 
-def record_staff_decision(application, decision):
+def record_staff_decision(application, decision, adjusted_amount=None, adjusted_term=None):
     """Persist an administrator's decision separately from model output."""
     allowed = {
         "approve": Application.Status.APPROVED,
@@ -73,8 +73,19 @@ def record_staff_decision(application, decision):
         raise ValueError("This application already has a final decision.")
 
     with transaction.atomic():
+        if decision == "approve" and adjusted_amount:
+            try:
+                application.amount_requested = Decimal(str(adjusted_amount))
+            except Exception:
+                pass
+        if decision == "approve" and adjusted_term:
+            try:
+                application.term_months = int(adjusted_term)
+            except Exception:
+                pass
+
         application.status = allowed[decision]
-        application.save(update_fields=["status", "updated_at"])
+        application.save(update_fields=["status", "amount_requested", "term_months", "updated_at"])
         if decision == "approve":
             create_loan_for(application)
 
@@ -82,7 +93,7 @@ def record_staff_decision(application, decision):
             user=application.user,
             applicant_name=application.applicant_name,
             message={
-                "approve": "A loan officer approved your application.",
+                "approve": f"A loan officer approved your loan for ₹{application.amount_requested:,.0f} ({application.term_months} months).",
                 "reject": "A loan officer declined your application.",
                 "needs_info": "A loan officer needs more information about your application.",
             }[decision],

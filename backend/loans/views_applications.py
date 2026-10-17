@@ -52,7 +52,10 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         application = self.get_object()
         try:
             application = record_staff_decision(
-                application, request.data.get("decision", "")
+                application,
+                request.data.get("decision", ""),
+                adjusted_amount=request.data.get("adjusted_amount"),
+                adjusted_term=request.data.get("adjusted_term"),
             )
         except ValueError as error:
             return Response({"detail": str(error)}, status=status.HTTP_400_BAD_REQUEST)

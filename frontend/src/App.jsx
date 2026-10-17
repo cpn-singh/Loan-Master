@@ -28,6 +28,7 @@ function App() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
   const [showNew, setShowNew] = useState(false);
+  const [newAppInitialValues, setNewAppInitialValues] = useState({});
   const [showUsers, setShowUsers] = useState(false);
   const [trainingModel, setTrainingModel] = useState(false);
   const [toast, setToast] = useState("");
@@ -118,11 +119,11 @@ function App() {
     }
   };
 
-  const decideApplication = async (application, decision) => {
+  const decideApplication = async (application, decision, adjustments = {}) => {
     try {
       await api(`/applications/${application.id}/decision/`, {
         method: "POST",
-        body: JSON.stringify({ decision }),
+        body: JSON.stringify({ decision, ...adjustments }),
       });
       setSelected(null);
       await load();
@@ -323,16 +324,29 @@ function App() {
         notifications={notifications}
         offline={offline}
         loadError={loadError}
-        onNew={() => setShowNew(true)}
+        onNew={() => {
+          setNewAppInitialValues({});
+          setShowNew(true);
+        }}
+        onApplyFromSimulator={(values) => {
+          setNewAppInitialValues(values);
+          setShowNew(true);
+        }}
+        onRecordPayment={recordPayment}
         onLogout={signOut}
         onRead={markRead}
         onRetry={load}
         newApplication={
           showNew && (
             <NewApplicationModal
-              onClose={() => setShowNew(false)}
+              initialValues={newAppInitialValues}
+              onClose={() => {
+                setShowNew(false);
+                setNewAppInitialValues({});
+              }}
               onCreated={async () => {
                 setShowNew(false);
+                setNewAppInitialValues({});
                 await load();
                 setToast(
                   "Application submitted. It is in the staff review queue.",

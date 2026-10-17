@@ -128,16 +128,39 @@ export default function ApplicationDrawer({
         </p>
         {["under_review", "needs_info"].includes(application.status) && (
           <div className="application-decision-actions">
-            <strong>Staff decision</strong>
+            <strong>Staff decision & Counter-offer</strong>
             <span>
-              Review the application and policy factors before recording a
-              decision.
+              Review the application and policy factors. You may approve as requested or propose revised terms.
             </span>
+            <div style={{ margin: "10px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <label style={{ fontSize: "11px", fontWeight: "600", color: "#555d59" }}>
+                Approved Amount (₹)
+                <input
+                  id="adj-amount"
+                  type="number"
+                  defaultValue={application.amount_requested}
+                  style={{ width: "100%", padding: "5px 8px", marginTop: "4px", fontSize: "12px", border: "1px solid #dcdfdc", borderRadius: "5px" }}
+                />
+              </label>
+              <label style={{ fontSize: "11px", fontWeight: "600", color: "#555d59" }}>
+                Approved Term (mo)
+                <input
+                  id="adj-term"
+                  type="number"
+                  defaultValue={application.term_months || 24}
+                  style={{ width: "100%", padding: "5px 8px", marginTop: "4px", fontSize: "12px", border: "1px solid #dcdfdc", borderRadius: "5px" }}
+                />
+              </label>
+            </div>
             <button
               className="primary-button"
-              onClick={() => onDecision("approve")}
+              onClick={() => {
+                const adjAmount = document.getElementById("adj-amount")?.value;
+                const adjTerm = document.getElementById("adj-term")?.value;
+                onDecision("approve", { adjusted_amount: adjAmount, adjusted_term: adjTerm });
+              }}
             >
-              <Check size={14} /> Approve and create loan
+              <Check size={14} /> Approve loan (with specified terms)
             </button>
             <button
               className="secondary-button"

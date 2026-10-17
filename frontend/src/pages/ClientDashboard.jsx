@@ -3,6 +3,7 @@ import {
   CalendarDays,
   Check,
   CreditCard,
+  Download,
   FileText,
   LogOut,
   Plus,
@@ -14,6 +15,7 @@ import StatCard from "../components/StatCard.jsx";
 import StatusPill from "../components/StatusPill.jsx";
 import LoanSimulator from "../components/LoanSimulator.jsx";
 import { currency, dateLabel, initials } from "../lib/formatters.js";
+import { generateLoanStatementPDF } from "../lib/statementGenerator.js";
 
 // Clients only receive the records and actions passed in for their account.
 export default function ClientDashboard({
@@ -25,6 +27,8 @@ export default function ClientDashboard({
   offline,
   loadError,
   onNew,
+  onApplyFromSimulator,
+  onRecordPayment,
   onLogout,
   onRead,
   onRetry,
@@ -124,7 +128,7 @@ export default function ClientDashboard({
             tone="peach"
           />
         </section>
-        <LoanSimulator />
+        <LoanSimulator onApply={onApplyFromSimulator} />
         <div className="client-columns">
           <section className="panel" id="my-applications">
             <div className="panel-heading">
@@ -178,13 +182,21 @@ export default function ClientDashboard({
                 <article className="client-loan-card" key={loan.id}>
                   <div className="client-loan-heading">
                     <span className="loan-avatar">{initials(name)}</span>
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <strong>{loan.purpose}</strong>
                       <small>
                         {loan.term_months}-month term · {loan.annual_rate}%
                         annual rate
                       </small>
                     </div>
+                    <button
+                      type="button"
+                      className="icon-button"
+                      title="Download Official Statement (PDF)"
+                      onClick={() => generateLoanStatementPDF(loan, name)}
+                    >
+                      <Download size={15} />
+                    </button>
                     <StatusPill status={loan.status} />
                   </div>
                   <div className="client-loan-balance">
@@ -243,6 +255,24 @@ export default function ClientDashboard({
                     )}
                   </span>
                   <StatusPill status={repayment.status} />
+                  {onRecordPayment && repayment.status !== "paid" && (
+                    <button
+                      className="small-action"
+                      style={{
+                        marginLeft: "8px",
+                        padding: "3px 9px",
+                        fontSize: "11px",
+                        borderRadius: "5px",
+                        background: "#347b60",
+                        color: "#fff",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => onRecordPayment(repayment)}
+                    >
+                      Pay now
+                    </button>
+                  )}
                 </div>
               ))}
               {dueRows.length === 0 && (

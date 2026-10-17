@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Loan, Notification, Repayment
@@ -29,6 +29,8 @@ class LoanViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset.filter(application__user=self.request.user)
 
     def get_permissions(self):
+        if self.action == "simulate":
+            return [AllowAny()]
         if self.action in ("disburse",):
             return [IsAdministrator()]
         return [IsAuthenticated()]
@@ -75,8 +77,6 @@ class RepaymentViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset.filter(loan__application__user=self.request.user)
 
     def get_permissions(self):
-        if self.action == "pay":
-            return [IsAdministrator()]
         return [IsAuthenticated()]
 
     @action(detail=True, methods=["post"])

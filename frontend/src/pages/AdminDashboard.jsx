@@ -772,7 +772,9 @@ export default function AdminDashboard({
           application={selected}
           onClose={() => setSelected(null)}
           onAssess={runAssessment}
-          onDecision={(decision) => decideApplication(selected, decision)}
+          onDecision={(decision, adjustments) =>
+            decideApplication(selected, decision, adjustments)
+          }
           modelTrained={riskModelStatus.trained}
         />
       )}

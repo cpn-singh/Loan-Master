@@ -2,17 +2,22 @@ import { useState } from "react";
 import { ArrowRight, X } from "lucide-react";
 import { api } from "../lib/api.js";
 
-export default function NewApplicationModal({ onClose, onCreated, onError }) {
+export default function NewApplicationModal({
+  onClose,
+  onCreated,
+  onError,
+  initialValues = {},
+}) {
   const [form, setForm] = useState({
-    applicant_name: "",
-    email: "",
-    purpose: "",
-    amount_requested: "",
-    annual_income: "",
-    monthly_debt: "0",
-    term_months: "24",
-    monthly_payment_estimate: "",
-    employment_status: "",
+    applicant_name: initialValues.applicant_name || "",
+    email: initialValues.email || "",
+    purpose: initialValues.purpose || "",
+    amount_requested: initialValues.amount_requested || "",
+    annual_income: initialValues.annual_income || "",
+    monthly_debt: initialValues.monthly_debt ?? "0",
+    term_months: initialValues.term_months || "24",
+    monthly_payment_estimate: initialValues.monthly_payment_estimate || "",
+    employment_status: initialValues.employment_status || "",
   });
   const [saving, setSaving] = useState(false);
   const update = (event) =>

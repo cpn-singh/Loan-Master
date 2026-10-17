@@ -4373,5 +4373,47 @@ td {
   font-weight: 500 !important;
 }
 
+/* ── Mobile & Tablet Responsiveness Enhancements ── */
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #eceeef;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .page-wrap {
+    padding: 20px 15px;
+  }
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  .client-columns {
+    grid-template-columns: 1fr;
+  }
+  .landing-hero-inner {
+    grid-template-columns: 1fr;
+  }
+  .landing-visual {
+    height: 380px;
+  }
+}
+
+@media (max-width: 560px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+  .topbar {
+    padding: 0 15px;
+  }
+}
+
+
 
 

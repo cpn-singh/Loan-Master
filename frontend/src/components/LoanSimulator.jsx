@@ -51,7 +51,7 @@ function SplitBar({ principal, interest }) {
 }
 
 // Sends hypothetical values to Django; the simulator never creates a loan.
-export default function LoanSimulator() {
+export default function LoanSimulator({ onApply }) {
   const [inputs, setInputs] = useState(emptyInputs);
   const [estimate, setEstimate] = useState(null);
   const [error, setError] = useState("");
@@ -82,22 +82,30 @@ export default function LoanSimulator() {
     }
   };
 
-  // Build first-3-month table from estimate
+  const [showAllMonths, setShowAllMonths] = useState(false);
+
+  // Build complete amortization table for the entire chosen term
   const buildSchedule = (est) => {
     if (!est) return [];
     const principal = Number(inputs.amount_requested);
     const annualRate = Number(est.annual_rate) / 100;
     const monthlyRate = annualRate / 12;
     const payment = Number(est.monthly_payment);
+    const totalMonths = Number(inputs.term_months) || 12;
     let balance = principal;
     const rows = [];
-    for (let i = 1; i <= Math.min(3, Number(inputs.term_months) || 3); i++) {
+    for (let i = 1; i <= totalMonths; i++) {
       const interestCharge = balance * monthlyRate;
-      const principalCharge = payment - interestCharge;
-      balance = Math.max(0, balance - principalCharge);
+      let principalCharge = payment - interestCharge;
+      if (i === totalMonths || balance - principalCharge < 0) {
+        principalCharge = balance;
+        balance = 0;
+      } else {
+        balance = Math.max(0, balance - principalCharge);
+      }
       rows.push({
         month: i,
-        payment,
+        payment: principalCharge + interestCharge,
         principal: principalCharge,
         interest: interestCharge,
         balance,
@@ -219,29 +227,88 @@ export default function LoanSimulator() {
               </div>
               {schedule.length > 0 && (
                 <div className="sim-mini-table-wrap">
-                  <div className="sim-mini-table-label">First {schedule.length} installment{schedule.length > 1 ? 's' : ''}</div>
-                  <table className="sim-mini-table">
-                    <thead>
-                      <tr>
-                        <th>Month</th>
-                        <th>Payment</th>
-                        <th>Principal</th>
-                        <th>Interest</th>
-                        <th>Balance</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {schedule.map((row) => (
-                        <tr key={row.month}>
-                          <td>{row.month}</td>
-                          <td>{currency(row.payment)}</td>
-                          <td>{currency(row.principal)}</td>
-                          <td>{currency(row.interest)}</td>
-                          <td>{currency(row.balance)}</td>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "6px",
+                    }}
+                  >
+                    <div className="sim-mini-table-label" style={{ margin: 0 }}>
+                      Repayment Schedule ({schedule.length} months)
+                    </div>
+                    {schedule.length > 4 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllMonths(!showAllMonths)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#347b60",
+                          fontSize: "11px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          padding: 0,
+                        }}
+                      >
+                        {showAllMonths
+                          ? "Show less"
+                          : `View all ${schedule.length} months`}
+                      </button>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      maxHeight: showAllMonths ? "280px" : "none",
+                      overflowY: showAllMonths ? "auto" : "visible",
+                    }}
+                  >
+                    <table className="sim-mini-table">
+                      <thead>
+                        <tr>
+                          <th>Month</th>
+                          <th>Payment</th>
+                          <th>Principal</th>
+                          <th>Interest</th>
+                          <th>Balance</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {(showAllMonths ? schedule : schedule.slice(0, 8)).map(
+                          (row) => (
+                            <tr key={row.month}>
+                              <td>Month {row.month}</td>
+                              <td>{currency(row.payment)}</td>
+                              <td>{currency(row.principal)}</td>
+                              <td>{currency(row.interest)}</td>
+                              <td>{currency(row.balance)}</td>
+                            </tr>
+                          ),
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              {onApply && (
+                <div style={{ marginTop: "14px" }}>
+                  <button
+                    type="button"
+                    className="primary-button"
+                    style={{ width: "100%", height: "40px", fontSize: "13px" }}
+                    onClick={() =>
+                      onApply({
+                        amount_requested: inputs.amount_requested,
+                        annual_income: inputs.annual_income,
+                        monthly_debt: inputs.monthly_debt || "0",
+                        term_months: inputs.term_months,
+                        monthly_payment_estimate: estimate.monthly_payment,
+                      })
+                    }
+                  >
+                    Apply with these terms <TrendingUp size={16} />
+                  </button>
                 </div>
               )}
               <p className="simulator-disclaimer">{estimate.disclaimer}</p>
