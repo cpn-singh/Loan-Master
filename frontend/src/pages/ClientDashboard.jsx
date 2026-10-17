@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Bell,
   CalendarDays,
@@ -6,6 +7,7 @@ import {
   Download,
   FileText,
   LogOut,
+  Menu,
   Plus,
   ShieldCheck,
   WalletCards,
@@ -36,6 +38,7 @@ export default function ClientDashboard({
   toast,
   clearToast,
 }) {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const name = `${user.first_name} ${user.last_name}`.trim() || user.username;
   const dueRows = loans
     .filter((loan) => loan.status === "active")
@@ -55,21 +58,39 @@ export default function ClientDashboard({
             loanwise<span className="brand-dot">.</span>
           </span>
         </a>
-        <nav>
-          <a href="#my-loans">My loans</a>
-          <a href="#my-applications">Applications</a>
-          <a href="#loan-simulator">Simulator</a>
-          <a href="#client-notifications">Notifications</a>
+        <nav className={`client-nav ${mobileNavOpen ? "open" : ""}`}>
+          <a href="#my-loans" onClick={() => setMobileNavOpen(false)}>
+            My loans
+          </a>
+          <a href="#my-applications" onClick={() => setMobileNavOpen(false)}>
+            Applications
+          </a>
+          <a href="#loan-simulator" onClick={() => setMobileNavOpen(false)}>
+            Simulator
+          </a>
+          <a
+            href="#client-notifications"
+            onClick={() => setMobileNavOpen(false)}
+          >
+            Notifications
+          </a>
         </nav>
         <div className="client-account">
           <span className="profile-avatar">{initials(name)}</span>
-          <span>{name}</span>
+          <span className="client-user-name">{name}</span>
           <button
             className="icon-button"
             onClick={onLogout}
             aria-label="Log out"
           >
             <LogOut size={16} />
+          </button>
+          <button
+            className="client-mobile-toggle"
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </header>

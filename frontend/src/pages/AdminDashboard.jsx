@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ArrowDownLeft,
   ArrowRight,
@@ -15,6 +16,7 @@ import {
   Filter,
   LayoutDashboard,
   LogOut,
+  Menu,
   MoreHorizontal,
   Plus,
   Search,
@@ -99,15 +101,33 @@ export default function AdminDashboard({
   trainingModel,
   visibleApplications = [],
 }) {
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const modelStatus = riskModelStatus || {};
   const dash = dashboard || {};
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      {mobileSidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`sidebar ${mobileSidebarOpen ? "open" : ""}`}>
+        <button
+          className="sidebar-close-btn"
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-label="Close navigation"
+        >
+          <X size={18} />
+        </button>
         <a
           className="brand"
           href="#overview"
-          onClick={() => setActiveNav("Overview")}
+          onClick={() => {
+            setActiveNav("Overview");
+            setMobileSidebarOpen(false);
+          }}
         >
           <span className="brand-mark">
             <WalletCards size={19} />
@@ -127,7 +147,10 @@ export default function AdminDashboard({
         <nav className="main-nav">
           <button
             className={`nav-item ${activeNav === "Overview" ? "active" : ""}`}
-            onClick={() => setActiveNav("Overview")}
+            onClick={() => {
+              setActiveNav("Overview");
+              setMobileSidebarOpen(false);
+            }}
           >
             <LayoutDashboard size={17} /> Overview
           </button>
@@ -135,6 +158,7 @@ export default function AdminDashboard({
             className={`nav-item ${activeNav === "Applications" ? "active" : ""}`}
             onClick={() => {
               setActiveNav("Applications");
+              setMobileSidebarOpen(false);
               document
                 .getElementById("applications")
                 ?.scrollIntoView({ behavior: "smooth" });
@@ -147,6 +171,7 @@ export default function AdminDashboard({
             className={`nav-item ${activeNav === "Loans" ? "active" : ""}`}
             onClick={() => {
               setActiveNav("Loans");
+              setMobileSidebarOpen(false);
               document
                 .getElementById("loans")
                 ?.scrollIntoView({ behavior: "smooth" });
@@ -158,6 +183,7 @@ export default function AdminDashboard({
             className={`nav-item ${activeNav === "Repayments" ? "active" : ""}`}
             onClick={() => {
               setActiveNav("Repayments");
+              setMobileSidebarOpen(false);
               document
                 .getElementById("repayments")
                 ?.scrollIntoView({ behavior: "smooth" });
@@ -169,6 +195,7 @@ export default function AdminDashboard({
             className={`nav-item ${activeNav === "Simulator" ? "active" : ""}`}
             onClick={() => {
               setActiveNav("Simulator");
+              setMobileSidebarOpen(false);
               document
                 .getElementById("admin-simulator")
                 ?.scrollIntoView({ behavior: "smooth" });
@@ -176,7 +203,13 @@ export default function AdminDashboard({
           >
             <Calculator size={17} /> Simulator
           </button>
-          <button className="nav-item" onClick={() => setShowUsers(true)}>
+          <button
+            className="nav-item"
+            onClick={() => {
+              setShowUsers(true);
+              setMobileSidebarOpen(false);
+            }}
+          >
             <Users size={17} /> Users & access
           </button>
         </nav>
@@ -204,8 +237,17 @@ export default function AdminDashboard({
 
       <main className="main-content">
         <header className="topbar">
-          <div className="breadcrumbs">
-            Workspace <span>/</span> <strong>{activeNav}</strong>
+          <div className="topbar-left">
+            <button
+              className="mobile-sidebar-toggle"
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              aria-label="Open navigation menu"
+            >
+              <Menu size={20} />
+            </button>
+            <div className="breadcrumbs">
+              Workspace <span>/</span> <strong>{activeNav}</strong>
+            </div>
           </div>
           <div className="top-actions">
             <div className="top-date">
